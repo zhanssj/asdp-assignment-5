@@ -1,0 +1,9 @@
+.idea/
+*.iml
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+infra/.local/
+infra/build/
+infra/.env

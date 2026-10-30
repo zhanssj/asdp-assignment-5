@@ -1,0 +1,57 @@
+pipeline {
+    agent { label 'docker-python' }
+    options {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        timestamps()
+        timeout(time: 15, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '15'))
+    }
+    triggers { pollSCM('* * * * *') }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'mkdir -p infra/build && git rev-parse HEAD > infra/build/source-commit.txt'
+                script { env.SOURCE_SHA = readFile('infra/build/source-commit.txt').trim() }
+            }
+        }
+        stage('Unit and API tests') {
+            steps {
+                sh '''
+                    set -eu
+                    docker build --target test -f infra/Dockerfile -t asdp5-tests:${BUILD_NUMBER} .
+                    docker create --name asdp5-tests-${BUILD_NUMBER} --label com.asdp.assignment=5 asdp5-tests:${BUILD_NUMBER}
+                    status=0
+                    docker start -a asdp5-tests-${BUILD_NUMBER} || status=$?
+                    docker cp asdp5-tests-${BUILD_NUMBER}:/reports/junit.xml infra/build/junit.xml
+                    exit "$status"
+                '''
+            }
+            post { always { junit testResults: 'infra/build/junit.xml', allowEmptyResults: false } }
+        }
+        stage('Build application image') {
+            steps {
+                sh 'docker build --target runtime --build-arg SOURCE_COMMIT=$SOURCE_SHA -f infra/Dockerfile -t asdp5-analyzer:$SOURCE_SHA .'
+            }
+        }
+        stage('Container smoke test') {
+            steps {
+                sh '''
+                    set -eu
+                    docker run -d --name asdp5-smoke-${BUILD_NUMBER} --label com.asdp.assignment=5 --network asdp5-ci asdp5-analyzer:$SOURCE_SHA
+                    python3 infra/scripts/verify_http.py http://asdp5-smoke-${BUILD_NUMBER}:8000 $SOURCE_SHA infra/build/smoke.json
+                '''
+            }
+        }
+        stage('Deploy local test service') {
+            steps { sh 'python3 infra/scripts/deploy.py asdp5-analyzer:$SOURCE_SHA $SOURCE_SHA' }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'infra/build/*.xml,infra/build/*.json,infra/build/*.txt', allowEmptyArchive: true
+            sh 'docker rm -f asdp5-tests-${BUILD_NUMBER} asdp5-smoke-${BUILD_NUMBER} >/dev/null 2>&1 || true'
+        }
+    }
+}

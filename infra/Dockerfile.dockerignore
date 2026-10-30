@@ -1,0 +1,8 @@
+**
+!app/
+!app/**
+!tests/
+!tests/**
+!infra/
+!infra/requirements.lock
+!infra/requirements-test.lock

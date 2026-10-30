@@ -1,0 +1,41 @@
+name: asdp5
+services:
+  jenkins:
+    build: ./jenkins
+    image: asdp5-jenkins:local
+    container_name: asdp5-jenkins
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+      SCM_URL: "${SCM_URL:-https://github.com/zhanssj/asdp-assignment-5.git}"
+    secrets:
+      - admin_password
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - agent-auth:/run/agent-auth
+      - ../:/opt/source:ro
+    networks: [ci]
+  agent:
+    build: ./agent
+    image: asdp5-agent:local
+    container_name: asdp5-agent
+    restart: unless-stopped
+    depends_on: [jenkins]
+    volumes:
+      - agent-auth:/run/agent-auth:ro
+      - agent-work:/home/jenkins/agent
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../:/opt/source:ro
+    networks: [ci]
+secrets:
+  admin_password:
+    file: ./.local/admin-password.txt
+volumes:
+  jenkins-data:
+  agent-auth:
+  agent-work:
+networks:
+  ci:
+    name: asdp5-ci

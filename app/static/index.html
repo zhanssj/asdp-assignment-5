@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart City Sensor Data Analyzer</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">ASDP <span>RESEARCH TOOLS</span></a><span class="version">ASSIGNMENT 05 · v1.0.0</span></header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow">URBAN DATA RESEARCH</p>
+      <h1>Smart City Sensor<br>Data Analyzer<span>.</span></h1>
+      <p class="lead">Inspect environmental and urban sensor CSV data, calculate descriptive statistics and export a traceable analysis.</p>
+    </section>
+    <section class="workspace" aria-label="Analyze a dataset">
+      <div class="input-panel">
+        <div class="panel-heading"><span class="step">01</span><h2>Choose your data</h2></div>
+        <label class="upload-zone" id="drop-zone" for="file-input">
+          <span class="upload-icon" aria-hidden="true">↑</span>
+          <strong id="file-label">Choose or drop a CSV file</strong>
+          <span>UTF-8 · comma-separated · up to 5 MiB</span>
+          <input id="file-input" type="file" accept=".csv,text/csv">
+        </label>
+        <button id="example-button" class="text-button" type="button">Load example measurements <span aria-hidden="true">↗</span></button>
+        <p class="small-note">The example contains five illustrative temperature measurements, from 20 to 28 °C.</p>
+        <div class="divider"></div>
+        <div class="panel-heading"><span class="step">02</span><h2>Select a measurement</h2></div>
+        <label class="field-label" for="column-select">Numeric column</label>
+        <select id="column-select" disabled><option value="">Upload a dataset first</option></select>
+        <label class="field-label" for="unit-input">Unit <span class="optional">(optional label)</span></label>
+        <input id="unit-input" type="text" maxlength="32" placeholder="e.g. °C, mg/L or seconds" disabled>
+        <button id="analyze-button" class="primary-button" type="button" disabled>Calculate statistics <span aria-hidden="true">→</span></button>
+        <p class="small-note">Blank measurements are excluded and counted. Invalid nonblank numbers are rejected. A unit labels the values; it does not convert them.</p>
+      </div>
+      <div class="result-panel">
+        <div class="result-top"><div><p class="eyebrow">YOUR ANALYSIS</p><h2 id="result-title">Ready when you are</h2></div><span id="result-badge" class="badge">NO DATA</span></div>
+        <p id="status" class="status" role="status" aria-live="polite">Choose a dataset or load the example to begin.</p>
+        <div id="empty-state" class="empty-state"><span aria-hidden="true">∑</span><h3>Explore your sensor measurements.</h3><p>Your statistics and chart will appear here.</p></div>
+        <div id="results" hidden>
+          <div class="stat-grid" id="stat-grid"></div>
+          <div class="chart-heading"><h3>Measurement profile</h3><span>Order in the uploaded file</span></div>
+          <div class="chart-container"><canvas id="measurement-chart" role="img" aria-label="Measurement profile; numerical values are also available in the JSON download."></canvas></div>
+          <p id="analysis-note" class="small-note"></p>
+          <div class="download-row"><button id="json-button" class="secondary-button" type="button" disabled>Download result JSON ↓</button><button id="csv-button" class="secondary-button" type="button" disabled>Download summary CSV ↓</button></div>
+          <details class="provenance"><summary>Reproduce this result</summary><p id="provenance-text"></p><code id="input-hash"></code></details>
+        </div>
+      </div>
+    </section>
+    <section id="preview-section" class="preview-panel" hidden><div class="preview-heading"><h2>Dataset preview</h2><span id="preview-caption"></span></div><div class="table-scroll"><table id="preview-table"><thead></thead><tbody></tbody></table></div></section>
+    <footer><span>ASDP · Reproducible smart city research</span><span>Sample standard deviation uses n − 1. One measurement has no sample deviation.</span></footer>
+  </main>
+</body>
+</html>
