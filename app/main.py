@@ -13,6 +13,7 @@ STATIC = Path(__file__).parent / 'static'
 
 @app.exception_handler(DataError)
 async def data_error(request: Request, exc: DataError):
+
     return JSONResponse(status_code=exc.status_code, content={'message': str(exc)})
 
 
