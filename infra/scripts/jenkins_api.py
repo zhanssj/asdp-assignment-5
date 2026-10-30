@@ -36,14 +36,15 @@ if __name__ == '__main__':
     elif action == 'status':
         print(json.dumps(get(opener,JOB+'api/json?tree=name,lastBuild[number,result,building,url],queueItem[id]')))
     elif action == 'evidence':
-        result = get(opener,JOB+'lastBuild/api/json')
-        stages = get(opener,JOB+'lastBuild/wfapi/describe')
-        tests = get(opener,JOB+'lastBuild/testReport/api/json')
+        result = get(opener,JOB+'lastCompletedBuild/api/json')
+        build_path = JOB+str(result['number'])+'/'
+        stages = get(opener,build_path+'wfapi/describe')
+        tests = get(opener,build_path+'testReport/api/json')
         root = INFRA/'build'; root.mkdir(exist_ok=True)
         for name, data in [('jenkins-build',result),('jenkins-stages',stages),('jenkins-tests',tests)]:
             (root/(name+'.json')).write_text(json.dumps(data,indent=2),encoding='utf-8')
         for name in ('deployment.json','smoke.json','source-commit.txt','junit.xml'):
-            with opener.open(BASE+JOB+'lastBuild/artifact/infra/build/'+name,timeout=20) as r:
+            with opener.open(BASE+build_path+'artifact/infra/build/'+name,timeout=20) as r:
                 (root/name).write_bytes(r.read())
         print(json.dumps(dict(build=result['number'],result=result['result'],
             stages=[dict(name=s['name'],status=s['status']) for s in stages['stages']],

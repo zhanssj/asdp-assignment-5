@@ -10,6 +10,8 @@ A separate deployment-recovery check deliberately requested an incorrect source 
 
 The agent was subsequently extended with Docker Buildx so subsequent runs use BuildKit and its Dockerfile-specific context exclusions. Runtime/test dependencies and container base digests are pinned; installed Jenkins plugin versions are recorded in `infra/jenkins/plugins.txt`.
 
+Build **#2** was automatically triggered by SCM polling after commit `a671e30472260c6e3deee5859f1ca9ee97b122db` was published. It also finished **SUCCESS**, with all **63 tests passing**, BuildKit image construction, HTTP verification and replacement of the local test service. This verifies automatic triggering and a repeated deployment, in addition to the first manual build.
+
 Live evidence: <http://localhost:8081/job/asdp-assignment-5/>. Jenkins retains JUnit XML, the source commit and JSON smoke/deployment reports as build artifacts. Local services are available while this computer and Docker are running. Screenshots and bilingual submission reports are stored in the separate Assignment 5 document folder.
 
 The demonstration validates local CI/CD and bounded CSV analysis. It does not establish production reliability, terabyte-scale performance or the thesis's storage-policy results.

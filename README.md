@@ -90,6 +90,8 @@ All Docker and build configuration lives under **infra**. The project root conta
 curl.exe -F 'file=@examples/temperature.csv' -F 'column=temperature_C' http://localhost:8000/api/analysis
 ```
 
+Measured execution details are recorded in [docs/verification.md](docs/verification.md).
+
 ## Sources and origin
 
 The interface and CSV analyzer concept continue <https://github.com/zhanssj/asdp-assignment-3>; the backend and delivery configuration are implemented for Assignment 5. Original project code is MIT licensed. Dependencies retain their licenses.
