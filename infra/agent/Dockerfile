@@ -4,6 +4,7 @@ USER root
 RUN apt-get update && apt-get install -y --no-install-recommends python3 curl git ca-certificates \
     && rm -rf /var/lib/apt/lists/* && usermod -aG root jenkins
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
 COPY start.sh /usr/local/bin/start-asdp-agent
 RUN chmod 755 /usr/local/bin/start-asdp-agent && git config --system --add safe.directory /opt/source
 USER jenkins

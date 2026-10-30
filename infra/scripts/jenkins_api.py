@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 (root/name).write_bytes(r.read())
         print(json.dumps(dict(build=result['number'],result=result['result'],
             stages=[dict(name=s['name'],status=s['status']) for s in stages['stages']],
-            totalTests=tests['totalCount'],failedTests=tests['failCount'])))
+            totalTests=sum(len(s.get('cases',[])) for s in tests.get('suites',[])),failedTests=tests['failCount'])))
     elif action == 'wait':
         for _ in range(45):
             result = get(opener,JOB+'api/json?tree=lastBuild[number,result,building],queueItem[id]')
